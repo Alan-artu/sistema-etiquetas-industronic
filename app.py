@@ -17,15 +17,26 @@ from reportlab.lib import colors
 # Configuración de la página web (Debe ir al principio)
 st.set_page_config(page_title="Industronic - Sistema de Etiquetas", layout="wide")
 
-# --- BLOQUE 1: LOGOTIPO Y TÍTULO (RESPONSIVO AUTOMÁTICO) ---
+# --- BLOQUE 1: LOGOTIPO Y TÍTULO (REDISEÑADO PARA NO CORTARSE) ---
 header_html = """
 <style>
-    .header-container { display: flex; align-items: center; margin-bottom: 10px; }
-    .logo-circle { background-color: #004dc3; width: 35px; height: 35px; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin-right: 10px; box-shadow: 0 0 8px rgba(0,77,195,0.3); }
-    .logo-text { color: white; font-family: 'Arial', sans-serif; font-size: 22px; font-weight: bold; letter-spacing: -1px; }
-    .brand-text { color: white; font-family: 'Segoe UI', sans-serif; font-size: 24px; font-weight: 500; }
-    /* El truco clamp() adapta la letra al tamaño de la pantalla */
-    .main-title { color: white; font-family: 'Impact', sans-serif; font-size: clamp(22px, 5vw, 30px); letter-spacing: 1px; margin-top: -5px; margin-bottom: 10px; text-transform: uppercase; line-height: 1.1; white-space: nowrap; }
+    .header-container { display: flex; align-items: center; margin-bottom: 8px; }
+    /* Agrandamos el logo */
+    .logo-circle { background-color: #004dc3; width: 45px; height: 45px; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin-right: 12px; box-shadow: 0 0 10px rgba(0,77,195,0.4); }
+    .logo-text { color: white; font-family: 'Arial', sans-serif; font-size: 28px; font-weight: bold; letter-spacing: -1px; }
+    .brand-text { color: white; font-family: 'Segoe UI', sans-serif; font-size: 28px; font-weight: 500; }
+    
+    /* Título más pequeño para que quepa en una sola línea en móvil */
+    .main-title { 
+        color: white; 
+        font-family: 'Impact', sans-serif; 
+        font-size: 24px; 
+        letter-spacing: 1px; 
+        margin-top: 5px; 
+        margin-bottom: 10px; 
+        text-transform: uppercase; 
+        line-height: 1.1; 
+    }
 </style>
 <div class="header-container">
     <div class="logo-circle">
@@ -38,7 +49,7 @@ header_html = """
 """
 st.markdown(header_html, unsafe_allow_html=True)
 
-# --- BLOQUE 2: ESTILOS CSS LIMPIOS ---
+# --- BLOQUE 2: ESTILOS CSS ---
 css_estilo = """
 <style>
 .stApp { background-color: #0E1117; }
@@ -155,7 +166,7 @@ zpl_logo_hecho_en_mexico = convertir_imagen_a_zpl("hecho_en_mexico.png", 40, 365
 
 if "numeros_chinos" not in st.session_state: st.session_state.numeros_chinos = {}
 
-# --- LAYOUT PRINCIPAL (STREAMLIT MANEJA EL STACK EN MÓVIL) ---
+# --- LAYOUT PRINCIPAL ---
 col_datos, col_etiqueta = st.columns([1, 1])
 
 with col_datos:
@@ -171,7 +182,7 @@ with col_datos:
     es_mr1 = (familia_seleccionada == "MR1")
     vcc_val = st.number_input("Voltaje de Baterías (Vcc):", value=240, step=12, disabled=es_mr1)
     
-    # Cuadro de verificación para proteger el tamaño de letra de arrastres accidentales en móvil
+    # Candado para el tamaño de letra para evitar errores táctiles
     habilitar_letra = st.checkbox("⚙️ Habilitar ajuste de tamaño de letra", value=False)
     tamano_letra = st.slider("Tamaño de letra:", min_value=14, max_value=36, value=26, step=2, disabled=not habilitar_letra)
     
@@ -185,19 +196,16 @@ with col_datos:
     
     # Serie de exactamente 9 dígitos que arranca en puros ceros
     num_serie_ini = st.text_input("Serie Inicial:", value="000000000", max_chars=9)
-    
     es_serie_valida = len(num_serie_ini) == 9 and num_serie_ini.isdigit()
     
     lista_series = []
     if es_serie_valida:
         try:
             s_int = int(num_serie_ini)
-            for i in range(cantidad): 
-                lista_series.append(str(s_int + i).zfill(9))
-        except: 
-            lista_series = ["000000000"]
+            for i in range(cantidad): lista_series.append(str(s_int + i).zfill(9))
+        except: lista_series = ["000000000"]
     else:
-        st.error("⚠️ La serie inicial debe ser un número de exactamente 9 dígitos (Ej. 000000000).")
+        st.error("⚠️ La serie inicial debe ser de exactamente 9 dígitos numéricos.")
         lista_series = ["000000000"] * int(cantidad)
 
     resumen_datos = []
