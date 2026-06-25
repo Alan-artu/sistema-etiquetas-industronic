@@ -54,7 +54,7 @@ css_estilo = """
 <style>
 .stApp { background-color: #0E1117; }
 /* Ajustes de etiquetas para que no se vean gigantes en móvil */
-.stSelectbox label, .stTextInput label, .stNumberInput label, .stSlider label {
+.stSelectbox label, .stTextInput label, .stNumberInput label, .stSlider label, .stCheckbox label {
     font-size: 13px !important; font-weight: 600 !important; color: #F0F2F6 !important;
 }
 .stTextInput > div > div > input, .stNumberInput > div > div > input, [data-baseweb="select"] > div {
@@ -63,6 +63,36 @@ css_estilo = """
 div.stButton > button:first-child {
     background-color: #004dc3 !important; color: white !important; border: none !important; font-weight: bold !important;
     padding: 10px 20px !important; border-radius: 8px !important; width: 100%;
+}
+
+/* Estilo para los cuadros contenedores de cada sección */
+.cuadro-seccion {
+    background-color: #141824;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    border-left: 4px solid #004dc3;
+}
+.cuadro-seccion-captura {
+    background-color: #111622;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    border-left: 4px solid #2e7d32;
+}
+.cuadro-seccion-resumen {
+    background-color: #151922;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    border-left: 4px solid #e65100;
+}
+.cuadro-seccion-preview {
+    background-color: #131722;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    border-left: 4px solid #7b1fa2;
 }
 </style>
 """
@@ -172,30 +202,45 @@ col_datos, col_etiqueta = st.columns([1, 1])
 
 with col_datos:
     crear_encabezado_seccion("Configuracion Tecnica")
-    c1, c2 = st.columns(2)
-    with c1:
-        modelo_seleccionado = st.selectbox("Modelo UPS:", options=list(CATALOGO_UPS.keys()))
-        voltaje_entrada = st.selectbox("Voltaje Entrada:", options=OPCIONES_VOLTAJE_ENTRADA)
-    with c2:
-        familia_seleccionada = st.selectbox("Familia:", options=OPCIONES_FAMILIA)
-        voltaje_salida = st.selectbox("Voltaje Salida:", options=OPCIONES_VOLTAJE_SALIDA)
+    
+    # CUADRO 1: Modelo UPS
+    st.markdown('<div class="cuadro-seccion">', unsafe_allow_html=True)
+    modelo_seleccionado = st.selectbox("Modelo UPS:", options=list(CATALOGO_UPS.keys()))
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # CUADRO 2: Familia
+    st.markdown('<div class="cuadro-seccion">', unsafe_allow_html=True)
+    familia_seleccionada = st.selectbox("Familia:", options=OPCIONES_FAMILIA)
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # CUADRO 3: Voltaje Entrada
+    st.markdown('<div class="cuadro-seccion">', unsafe_allow_html=True)
+    voltaje_entrada = st.selectbox("Voltaje Entrada:", options=OPCIONES_VOLTAJE_ENTRADA)
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # CUADRO 4: Voltaje Salida
+    st.markdown('<div class="cuadro-seccion">', unsafe_allow_html=True)
+    voltaje_salida = st.selectbox("Voltaje Salida:", options=OPCIONES_VOLTAJE_SALIDA)
+    st.markdown('</div>', unsafe_allow_html=True)
     
     es_mr1 = (familia_seleccionada == "MR1")
     vcc_val = st.number_input("Voltaje de Baterías (Vcc):", value=240, step=12, disabled=es_mr1)
-    tamano_letra = st.slider("Tamaño de letra:", min_value=14, max_value=36, value=26, step=2)
+    
+    # NUEVO: Cuadro de verificación para bloquear/desbloquear el tamaño de letra
+    habilitar_letra = st.checkbox("⚙️ Habilitar ajuste de tamaño de letra", value=False)
+    tamano_letra = st.slider("Tamaño de letra:", min_value=14, max_value=36, value=26, step=2, disabled=not habilitar_letra)
     
     datos_fijos = CATALOGO_UPS[modelo_seleccionado]
     kva_val = int(datos_fijos["capacidad"].split("kVA")[0])
     texto_baterias_final = ("240Vcc" if es_mr1 else f"{vcc_val}Vcc") if kva_val >= 300 else ("240Vcc (+/-120Vcc)" if es_mr1 else f"{vcc_val}Vcc (+/-{vcc_val // 2}Vcc)")
 
-    st.markdown("---")
+    # CUADRO CAPTURA
+    st.markdown('---')
+    st.markdown('<div class="cuadro-seccion-captura">', unsafe_allow_html=True)
     crear_encabezado_seccion("Captura Portatil")
     cantidad = st.number_input("Equipos en lote:", value=1, min_value=1)
-    
-    # MODIFICACIÓN SOLICITADA: Carga inicial en "000000000" y límite máximo de 9 caracteres
     num_serie_ini = st.text_input("Serie Inicial:", value="000000000", max_chars=9)
     
-    # VALIDACIÓN INMUNE A ERRORES: Verifica que sean exactamente 9 caracteres numéricos
     es_serie_valida = len(num_serie_ini) == 9 and num_serie_ini.isdigit()
     
     lista_series = []
@@ -207,9 +252,8 @@ with col_datos:
         except: 
             lista_series = ["000000000"]
     else:
-        # Alerta visual para el operador en el celular
         st.error("⚠️ La serie inicial debe ser un número de exactamente 9 dígitos (Ej. 000000000).")
-        lista_series = ["000000000"] * int(cantidad) # Mantiene la app estable mientras corrige
+        lista_series = ["000000000"] * int(cantidad)
 
     resumen_datos = []
     for i in range(int(cantidad)):
@@ -222,16 +266,18 @@ with col_datos:
             num_chino_final = st.text_input(f"Codigo interno {i+1}:", key=text_key)
             st.session_state.numeros_chinos[id_eq] = num_chino_final
         resumen_datos.append({"No. Equipo": f"Equipo {i+1}", "Número de Serie": f"{datos_fijos['modelo_corto']}-{serie_eq}", "Código Interno": num_chino_final if num_chino_final else "Sin Escanear"})
+    st.markdown('</div>', unsafe_allow_html=True)
 
-    st.markdown("---")
+    # CUADRO RESUMEN
+    st.markdown('---')
+    st.markdown('<div class="cuadro-seccion-resumen">', unsafe_allow_html=True)
     crear_encabezado_seccion("Resumen de Vinculacion")
     st.dataframe(pd.DataFrame(resumen_datos), use_container_width=True, hide_index=True)
     
     modelo_final = (modelo_seleccionado if familia_seleccionada == "Ninguno" else f"{modelo_seleccionado} {familia_seleccionada}")
     pdf_data = generar_pdf_reporte(resumen_datos, modelo_final, datos_fijos["capacidad"], voltaje_entrada, voltaje_salida)
-    
-    # El botón se desactiva visualmente si la serie está mal capturada
     st.download_button(label="📄 Descargar Reporte (PDF)", data=pdf_data, file_name=f"reporte_{time.strftime('%Y%m%d')}.pdf", mime="application/pdf", disabled=not es_serie_valida)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # --- COLUMNA DE PREVISUALIZACIÓN ---
 unificado_zpl = ""
@@ -240,6 +286,7 @@ for idx, s in enumerate(lista_series):
     unificado_zpl += f"^XA^CI28{zpl_logo_industronic}^FO40,100^A0N,{tamano_letra},{tamano_letra}^FDEquipo: UPS^FS^FO40,135^A0N,{tamano_letra},{tamano_letra}^FDModelo: {modelo_final}^FS^FO40,170^A0N,{tamano_letra},{tamano_letra}^FDV.Entrada: {voltaje_entrada}^FS^FO40,205^A0N,{tamano_letra},{tamano_letra}^FDCapacidad: {datos_fijos['capacidad']}^FS^FO40,240^A0N,{tamano_letra},{tamano_letra}^FDV.Baterias: {texto_baterias_final}^FS^FO40,275^A0N,{tamano_letra},{tamano_letra}^FDV.Salida: {voltaje_salida}^FS^FO40,310^A0N,{tamano_letra},{tamano_letra}^FDSerie:^FS{zpl_logo_hecho_en_mexico}^FO360,310^BY2,2.5,65^BCN,65,Y,N,N^FD{datos_fijos['modelo_corto']}-{s}^FS^FO360,405^A0N,18,18^FDCodigo interno: {chino_v}^FS^XZ\n"
 
 with col_etiqueta:
+    st.markdown('<div class="cuadro-seccion-preview">', unsafe_allow_html=True)
     crear_encabezado_seccion("Previsualizacion")
     def preview(s, idx):
         chino_p = st.session_state.numeros_chinos.get(f"eq_{idx}", "56111105305CS4800001")
@@ -247,6 +294,7 @@ with col_etiqueta:
         return requests.post("http://api.labelary.com/v1/printers/8dpmm/labels/4x3/0/", data=z.encode('utf-8')).content
     st.image(preview(lista_series[0], 0), use_container_width=True)
     st.download_button(label=f"💾 Descargar Etiquetas ZPL", data=unificado_zpl, file_name="etiquetas.zpl", disabled=not es_serie_valida)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # --- JAVASCRIPT INVISIBLE PARA BLOQUEAR EL TECLADO EN LOS SELECTBOXES ---
 components.html(
