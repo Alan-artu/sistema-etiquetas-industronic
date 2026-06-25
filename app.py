@@ -6,7 +6,7 @@ import time
 import pandas as pd
 from PIL import Image
 from io import BytesIO
-import streamlit.components.v1 as components  # NUEVA LIBRERÍA PARA EL SCRIPT INVISIBLE
+import streamlit.components.v1 as components
 
 # --- LIBRERÍAS DE REPORTLAB PARA EL PDF ---
 from reportlab.lib.pagesizes import letter
@@ -191,17 +191,29 @@ with col_datos:
     st.markdown("---")
     crear_encabezado_seccion("Captura Portatil")
     cantidad = st.number_input("Equipos en lote:", value=1, min_value=1)
-    num_serie_ini = st.text_input("Serie Inicial:", value="140426381")
+    
+    # MODIFICACIÓN SOLICITADA: Carga inicial en "000000000" y límite máximo de 9 caracteres
+    num_serie_ini = st.text_input("Serie Inicial:", value="000000000", max_chars=9)
+    
+    # VALIDACIÓN INMUNE A ERRORES: Verifica que sean exactamente 9 caracteres numéricos
+    es_serie_valida = len(num_serie_ini) == 9 and num_serie_ini.isdigit()
     
     lista_series = []
-    try:
-        s_int = int(num_serie_ini)
-        for i in range(cantidad): lista_series.append(str(s_int + i).zfill(len(num_serie_ini)))
-    except: lista_series = [num_serie_ini]
+    if es_serie_valida:
+        try:
+            s_int = int(num_serie_ini)
+            for i in range(cantidad): 
+                lista_series.append(str(s_int + i).zfill(9))
+        except: 
+            lista_series = ["000000000"]
+    else:
+        # Alerta visual para el operador en el celular
+        st.error("⚠️ La serie inicial debe ser un número de exactamente 9 dígitos (Ej. 000000000).")
+        lista_series = ["000000000"] * int(cantidad) # Mantiene la app estable mientras corrige
 
     resumen_datos = []
     for i in range(int(cantidad)):
-        serie_eq = lista_series[i] if i < len(lista_series) else num_serie_ini
+        serie_eq = lista_series[i] if i < len(lista_series) else "000000000"
         id_eq = f"eq_{i}"; text_key = f"in_{id_eq}"
         with st.expander(f"Equipo {i+1} - Serie: {serie_eq}", expanded=(i==0)):
             foto_cam = st.camera_input(f"Escanear (Eq {i+1})", key=f"cam_{id_eq}")
@@ -217,7 +229,9 @@ with col_datos:
     
     modelo_final = (modelo_seleccionado if familia_seleccionada == "Ninguno" else f"{modelo_seleccionado} {familia_seleccionada}")
     pdf_data = generar_pdf_reporte(resumen_datos, modelo_final, datos_fijos["capacidad"], voltaje_entrada, voltaje_salida)
-    st.download_button(label="📄 Descargar Reporte (PDF)", data=pdf_data, file_name=f"reporte_{time.strftime('%Y%m%d')}.pdf", mime="application/pdf")
+    
+    # El botón se desactiva visualmente si la serie está mal capturada
+    st.download_button(label="📄 Descargar Reporte (PDF)", data=pdf_data, file_name=f"reporte_{time.strftime('%Y%m%d')}.pdf", mime="application/pdf", disabled=not es_serie_valida)
 
 # --- COLUMNA DE PREVISUALIZACIÓN ---
 unificado_zpl = ""
@@ -232,26 +246,22 @@ with col_etiqueta:
         z = f"^XA^CI28{zpl_logo_industronic}^FO40,100^A0N,{tamano_letra},{tamano_letra}^FDEquipo: UPS^FS^FO40,135^A0N,{tamano_letra},{tamano_letra}^FDModelo: {modelo_final}^FS^FO40,170^A0N,{tamano_letra},{tamano_letra}^FDV.Entrada: {voltaje_entrada}^FS^FO40,205^A0N,{tamano_letra},{tamano_letra}^FDCapacidad: {datos_fijos['capacidad']}^FS^FO40,240^A0N,{tamano_letra},{tamano_letra}^FDV.Baterias: {texto_baterias_final}^FS^FO40,275^A0N,{tamano_letra},{tamano_letra}^FDV.Salida: {voltaje_salida}^FS^FO40,310^A0N,{tamano_letra},{tamano_letra}^FDSerie:^FS{zpl_logo_hecho_en_mexico}^FO360,310^BY2,2.5,65^BCN,65,Y,N,N^FD{datos_fijos['modelo_corto']}-{s}^FS^FO360,405^A0N,18,18^FDCodigo interno: {chino_p}^FS^XZ"
         return requests.post("http://api.labelary.com/v1/printers/8dpmm/labels/4x3/0/", data=z.encode('utf-8')).content
     st.image(preview(lista_series[0], 0), use_container_width=True)
-    st.download_button(label=f"💾 Descargar Etiquetas ZPL", data=unificado_zpl, file_name="etiquetas.zpl")
+    st.download_button(label=f"💾 Descargar Etiquetas ZPL", data=unificado_zpl, file_name="etiquetas.zpl", disabled=not es_serie_valida)
 
-# --- SOLUCIÓN MÁGICA: JAVASCRIPT INVISIBLE PARA BLOQUEAR EL TECLADO EN MÓVIL ---
+# --- JAVASCRIPT INVISIBLE PARA BLOQUEAR EL TECLADO EN LOS SELECTBOXES ---
 components.html(
     """
     <script>
     const doc = window.parent.document;
     function bloquearTecladoSelectores() {
-        // Busca todos los inputs que están dentro de un selectbox de Streamlit
         const inputs = doc.querySelectorAll('div[data-baseweb="select"] input');
         inputs.forEach(input => {
-            // Convierte el input en "solo lectura" para que el celular no ofrezca el teclado
             input.setAttribute('readonly', 'readonly');
-            // Evita que el toque intente forzar el foco de texto
             input.addEventListener('touchstart', function(e) {
                 input.blur();
             });
         });
     }
-    // Ejecutar inmediatamente y luego de forma periódica por si Streamlit recarga los componentes
     bloquearTecladoSelectores();
     setInterval(bloquearTecladoSelectores, 1000);
     </script>
