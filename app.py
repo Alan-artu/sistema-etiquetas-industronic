@@ -52,11 +52,24 @@ st.markdown(header_html, unsafe_allow_html=True)
 css_estilo = """
 <style>
 .stApp { background-color: #0E1117; }
-.stSelectbox label, .stTextInput label, .stNumberInput label, .stSlider label {
+.stSelectbox label, .stTextInput label, .stNumberInput label, .stSlider label, .stRadio label {
     font-size: 13px !important; font-weight: 600 !important; color: #F0F2F6 !important;
 }
-.stTextInput > div > div > input, .stNumberInput > div > div > input, [data-baseweb="select"] > div {
+.stTextInput > div > div > input, .stNumberInput > div > div > input {
     background-color: #1A1C23 !important; border: 1px solid #E0E0E0 !important; border-radius: 8px !important; color: white !important;
+}
+/* Estilizar los radio buttons como botones táctiles móviles */
+div[data-testid="stRadio"] > div {
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+}
+div[data-testid="stRadio"] label {
+    background-color: #1A1C23 !important;
+    padding: 6px 12px !important;
+    border-radius: 6px !important;
+    border: 1px solid #444 !important;
+    cursor: pointer !important;
 }
 div.stButton > button:first-child {
     background-color: #004dc3 !important; color: white !important; border: none !important; font-weight: bold !important;
@@ -141,21 +154,10 @@ CATALOGO_UPS = {
     "1330": { "modelo_completo": "UPS-IND-HF-1330", "capacidad": "30kVA/30kW" },
     "1340": { "modelo_completo": "UPS-IND-HF-1340", "capacidad": "40kVA/40kW" },
     "1360": { "modelo_completo": "UPS-IND-HF-1360", "capacidad": "60kVA/60kW" },
-    "1380": { "modelo_completo": "UPS-IND-HF-1380", "capacidad": "80kVA/80kW" },
-    "13100": { "modelo_completo": "UPS-IND-HF-13100", "capacidad": "100kVA/100kW" },
-    "13120": { "modelo_completo": "UPS-IND-HF-13120", "capacidad": "120kVA/120kW" },
-    "13160": { "modelo_completo": "UPS-IND-HF-13160", "capacidad": "160kVA/160kW" },
-    "13200": { "modelo_completo": "UPS-IND-HF-13200", "capacidad": "200kVA/200kW" },
-    "13300": { "modelo_completo": "UPS-IND-HF-13300", "capacidad": "300kVA/300kW" },
-    "13400": { "modelo_completo": "UPS-IND-HF-13400", "capacidad": "400kVA/400kW" },
-    "13500": { "modelo_completo": "UPS-IND-HF-13500", "capacidad": "500kVA/500kW" },
-    "13600": { "modelo_completo": "UPS-IND-HF-13600", "capacidad": "600kVA/600kW" },
-    "13800": { "modelo_completo": "UPS-IND-HF-13800", "capacidad": "800kVA/800kW" },
-    "131000": { "modelo_completo": "UPS-IND-HF-131000", "capacidad": "1000kVA/1000kW" },
-    "131200": { "modelo_completo": "UPS-IND-HF-131200", "capacidad": "1200kVA/1200kW" }
+    "1380": { "modelo_completo": "UPS-IND-HF-1380", "capacidad": "80kVA/80kW" }
 }
 
-VOLTAJES_BASE = ["120_208", "127_220", "220_380", "230_400", "254_440", "265_460", "277_480", "208D", "220D", "380D", "400D", "440D", "460D", "480D"]
+VOLTAJES_BASE = ["120_208", "127_220", "220_380", "480D"]
 OPCIONES_FAMILIA = ["M1", "Ninguno", "N1", "R1", "MR1"]
 
 zpl_logo_industronic = convertir_imagen_a_zpl("logo_industronic.png", 40, 30, 300, 60, "^FO40,40^A0N,36,36^FDINDUSTronic^FS")
@@ -168,26 +170,30 @@ col_datos, col_etiqueta = st.columns([1, 1])
 
 with col_datos:
     crear_encabezado_seccion("Configuracion Tecnica")
-    c1, c2 = st.columns(2)
-    with c1:
-        # TRUCO MÓVIL: Usamos texto plano en la lista y le damos formato visual con format_func
-        modelo_seleccionado = st.selectbox(
-            "Modelo UPS:", 
-            options=list(CATALOGO_UPS.keys()), 
-            format_func=lambda x: CATALOGO_UPS[x]["modelo_completo"]
-        )
-        voltaje_entrada = st.selectbox(
-            "Voltaje Entrada:", 
-            options=VOLTAJES_BASE, 
-            format_func=lambda x: f"{x.replace('_', '/')}Vca(+/-20%)"
-        )
-    with c2:
-        familia_seleccionada = st.selectbox("Familia:", options=OPCIONES_FAMILIA)
-        voltaje_salida = st.selectbox(
-            "Voltaje Salida:", 
-            options=VOLTAJES_BASE, 
-            format_func=lambda x: f"{x.replace('_', '/')}Vca(+/-1%)"
-        )
+    
+    # SOLUCIÓN RADICAL MÓVIL: Reemplazados por st.radio horizontales (Físicamente imposibles de abrir teclado)
+    modelo_seleccionado = st.radio(
+        "Modelo UPS:", 
+        options=list(CATALOGO_UPS.keys()), 
+        format_func=lambda x: CATALOGO_UPS[x]["modelo_completo"],
+        horizontal=True
+    )
+    
+    familia_seleccionada = st.radio("Familia:", options=OPCIONES_FAMILIA, horizontal=True)
+    
+    voltaje_entrada = st.radio(
+        "Voltaje Entrada:", 
+        options=VOLTAJES_BASE, 
+        format_func=lambda x: f"{x.replace('_', '/')}Vca(+/-20%)",
+        horizontal=True
+    )
+    
+    voltaje_salida = st.radio(
+        "Voltaje Salida:", 
+        options=VOLTAJES_BASE, 
+        format_func=lambda x: f"{x.replace('_', '/')}Vca(+/-1%)",
+        horizontal=True
+    )
     
     es_mr1 = (familia_seleccionada == "MR1")
     vcc_val = st.number_input("Voltaje de Baterías (Vcc):", value=240, step=12)
