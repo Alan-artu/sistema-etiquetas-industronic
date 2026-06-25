@@ -17,39 +17,38 @@ from reportlab.lib import colors
 # Configuración de la página web (Debe ir al principio)
 st.set_page_config(page_title="Industronic - Sistema de Etiquetas", layout="wide")
 
-# --- BLOQUE 1: LOGOTIPO Y TÍTULO (REDISEÑADO PARA NO CORTARSE) ---
+# --- BLOQUE 1: LOGOTIPO Y TÍTULO (GARANTIZADO PARA NO CORTARSE) ---
 header_html = """
-<style>
-    .header-container { display: flex; align-items: center; margin-bottom: 8px; }
-    /* Agrandamos el logo */
-    .logo-circle { background-color: #004dc3; width: 45px; height: 45px; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin-right: 12px; box-shadow: 0 0 10px rgba(0,77,195,0.4); }
-    .logo-text { color: white; font-family: 'Arial', sans-serif; font-size: 28px; font-weight: bold; letter-spacing: -1px; }
-    .brand-text { color: white; font-family: 'Segoe UI', sans-serif; font-size: 28px; font-weight: 500; }
-    
-    /* Título más pequeño para que quepa en móvil sin romperse feo */
-    .main-title { 
-        color: white; 
-        font-family: 'Impact', sans-serif; 
-        font-size: 24px; 
-        letter-spacing: 1px; 
-        margin-top: 5px; 
-        margin-bottom: 10px; 
-        text-transform: uppercase; 
-        line-height: 1.1; 
-    }
-</style>
-<div class="header-container">
-    <div class="logo-circle">
-        <span class="logo-text">!i</span>
+<div style="display: flex; align-items: center; margin-bottom: 8px;">
+    <div style="
+        background-color: #004dc3; 
+        width: 40px; 
+        height: 40px; 
+        border-radius: 50%; 
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+        margin-right: 12px; 
+        box-shadow: 0 0 10px rgba(0,77,195,0.4);
+    ">
+        <span style="color: white; font-family: 'Arial', sans-serif; font-size: 24px; font-weight: bold; letter-spacing: -1px;">!i</span>
     </div>
-    <span class="brand-text">Industronic</span>
+    <span style="color: white; font-family: 'Segoe UI', sans-serif; font-size: 26px; font-weight: 500;">Industronic</span>
 </div>
-<h1 class="main-title">SISTEMA DE ETIQUETAS</h1>
+<h1 style="
+    color: white; 
+    font-family: 'Impact', sans-serif; 
+    font-size: 22px; 
+    letter-spacing: 1px; 
+    margin-top: 5px; 
+    margin-bottom: 10px; 
+    text-transform: uppercase;
+">SISTEMA DE ETIQUETAS</h1>
 <hr style="border-top: 1px solid #444; margin-top: 0px; margin-bottom: 20px;">
 """
 st.markdown(header_html, unsafe_allow_html=True)
 
-# --- BLOQUE 2: ESTILOS CSS ---
+# --- BLOQUE 2: ESTILOS CSS AVANZADOS ---
 css_estilo = """
 <style>
 .stApp { background-color: #0E1117; }
@@ -62,6 +61,21 @@ css_estilo = """
 div.stButton > button:first-child {
     background-color: #004dc3 !important; color: white !important; border: none !important; font-weight: bold !important;
     padding: 10px 20px !important; border-radius: 8px !important; width: 100%;
+}
+
+/* --- MAGIA CSS: CONVERTIR CÁMARA EN ESCÁNER VERTICAL --- */
+[data-testid="stCameraInput"] {
+    max-width: 260px !important; /* Limita el ancho para hacerlo rectangular */
+    margin: 0 auto !important; /* Centra la cámara en la pantalla */
+    border: 2px solid #004dc3 !important; /* Marco azul tipo escáner */
+    border-radius: 12px !important;
+    padding: 5px !important;
+    background-color: #1A1C23 !important;
+}
+[data-testid="stCameraInput"] video {
+    object-fit: cover !important; /* Hace zoom para llenar el espacio sin deformar */
+    height: 350px !important; /* Fuerza una altura vertical mayor al ancho */
+    border-radius: 8px !important;
 }
 </style>
 """
@@ -166,14 +180,13 @@ zpl_logo_hecho_en_mexico = convertir_imagen_a_zpl("hecho_en_mexico.png", 40, 365
 
 if "numeros_chinos" not in st.session_state: st.session_state.numeros_chinos = {}
 
-# --- LAYOUT PRINCIPAL (STREAMLIT MANEJA EL STACK EN MÓVIL) ---
+# --- LAYOUT PRINCIPAL ---
 col_datos, col_etiqueta = st.columns([1, 1])
 
 with col_datos:
     crear_encabezado_seccion("Configuracion Tecnica")
     c1, c2 = st.columns(2)
     
-    # REORDENAMIENTO: c1 (Aparece primero arriba en celular) y c2 (Aparece después abajo en celular)
     with c1:
         modelo_seleccionado = st.selectbox("Modelo UPS:", options=list(CATALOGO_UPS.keys()))
         familia_seleccionada = st.selectbox("Familia:", options=OPCIONES_FAMILIA)
@@ -184,7 +197,6 @@ with col_datos:
     es_mr1 = (familia_seleccionada == "MR1")
     vcc_val = st.number_input("Voltaje de Baterías (Vcc):", value=240, step=12, disabled=es_mr1)
     
-    # Candado para el tamaño de letra
     habilitar_letra = st.checkbox("⚙️ Habilitar ajuste de tamaño de letra", value=False)
     tamano_letra = st.slider("Tamaño de letra:", min_value=14, max_value=36, value=26, step=2, disabled=not habilitar_letra)
     
@@ -196,7 +208,6 @@ with col_datos:
     crear_encabezado_seccion("Captura Portatil")
     cantidad = st.number_input("Equipos en lote:", value=1, min_value=1)
     
-    # Serie inicial obligatoria de 9 dígitos
     num_serie_ini = st.text_input("Serie Inicial:", value="000000000", max_chars=9)
     es_serie_valida = len(num_serie_ini) == 9 and num_serie_ini.isdigit()
     
@@ -215,7 +226,8 @@ with col_datos:
         serie_eq = lista_series[i] if i < len(lista_series) else "000000000"
         id_eq = f"eq_{i}"; text_key = f"in_{id_eq}"
         with st.expander(f"Equipo {i+1} - Serie: {serie_eq}", expanded=(i==0)):
-            foto_cam = st.camera_input(f"Escanear (Eq {i+1})", key=f"cam_{id_eq}")
+            # Aquí es donde se renderiza la cámara, ahora enmarcada por el CSS superior
+            foto_cam = st.camera_input(f"Escanear Etiqueta (Eq {i+1})", key=f"cam_{id_eq}")
             if foto_cam is not None and st.session_state.get(f"proc_{id_eq}") is None:
                 st.session_state[text_key] = "501211007220S1800005"; st.session_state[f"proc_{id_eq}"] = True; st.rerun()
             num_chino_final = st.text_input(f"Codigo interno {i+1}:", key=text_key)
