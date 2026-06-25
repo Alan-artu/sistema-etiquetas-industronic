@@ -17,43 +17,31 @@ from reportlab.lib import colors
 # Configuración de la página web (Debe ir al principio)
 st.set_page_config(page_title="Industronic - Sistema de Etiquetas", layout="wide")
 
-# --- BLOQUE 1: LOGOTIPO Y TÍTULO AJUSTADO PARA MÓVIL ---
+# --- BLOQUE 1: LOGOTIPO Y TÍTULO (RESPONSIVO AUTOMÁTICO) ---
 header_html = """
-<div style="display: flex; align-items: center; margin-bottom: 10px;">
-    <div style="
-        background-color: #004dc3; 
-        width: 35px; 
-        height: 35px; 
-        border-radius: 50%; 
-        display: flex; 
-        justify-content: center; 
-        align-items: center; 
-        margin-right: 10px;
-        box-shadow: 0 0 8px rgba(0,77,195,0.3);
-    ">
-        <span style="color: white; font-family: 'Arial', sans-serif; font-size: 22px; font-weight: bold; letter-spacing: -1px;">!i</span>
+<style>
+    .header-container { display: flex; align-items: center; margin-bottom: 10px; }
+    .logo-circle { background-color: #004dc3; width: 35px; height: 35px; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin-right: 10px; box-shadow: 0 0 8px rgba(0,77,195,0.3); }
+    .logo-text { color: white; font-family: 'Arial', sans-serif; font-size: 22px; font-weight: bold; letter-spacing: -1px; }
+    .brand-text { color: white; font-family: 'Segoe UI', sans-serif; font-size: 24px; font-weight: 500; }
+    /* El truco clamp() adapta la letra al tamaño de la pantalla */
+    .main-title { color: white; font-family: 'Impact', sans-serif; font-size: clamp(22px, 5vw, 30px); letter-spacing: 1px; margin-top: -5px; margin-bottom: 10px; text-transform: uppercase; line-height: 1.1; white-space: nowrap; }
+</style>
+<div class="header-container">
+    <div class="logo-circle">
+        <span class="logo-text">!i</span>
     </div>
-    <span style="color: white; font-family: 'Segoe UI', sans-serif; font-size: 24px; font-weight: 500;">Industronic</span>
+    <span class="brand-text">Industronic</span>
 </div>
-<h1 style="
-    color: white; 
-    font-family: 'Impact', sans-serif; 
-    font-size: 30px; 
-    letter-spacing: 1px; 
-    margin-top: -5px; 
-    margin-bottom: 10px;
-    text-transform: uppercase;
-    line-height: 1;
-">SISTEMA DE ETIQUETAS</h1>
+<h1 class="main-title">SISTEMA DE ETIQUETAS</h1>
 <hr style="border-top: 1px solid #444; margin-top: 0px; margin-bottom: 20px;">
 """
 st.markdown(header_html, unsafe_allow_html=True)
 
-# --- BLOQUE 2: ESTILOS CSS ---
+# --- BLOQUE 2: ESTILOS CSS LIMPIOS ---
 css_estilo = """
 <style>
 .stApp { background-color: #0E1117; }
-/* Ajustes de etiquetas para que no se vean gigantes en móvil */
 .stSelectbox label, .stTextInput label, .stNumberInput label, .stSlider label, .stCheckbox label {
     font-size: 13px !important; font-weight: 600 !important; color: #F0F2F6 !important;
 }
@@ -63,36 +51,6 @@ css_estilo = """
 div.stButton > button:first-child {
     background-color: #004dc3 !important; color: white !important; border: none !important; font-weight: bold !important;
     padding: 10px 20px !important; border-radius: 8px !important; width: 100%;
-}
-
-/* Estilo para los cuadros contenedores de cada sección */
-.cuadro-seccion {
-    background-color: #141824;
-    padding: 15px;
-    border-radius: 10px;
-    margin-bottom: 15px;
-    border-left: 4px solid #004dc3;
-}
-.cuadro-seccion-captura {
-    background-color: #111622;
-    padding: 15px;
-    border-radius: 10px;
-    margin-bottom: 15px;
-    border-left: 4px solid #2e7d32;
-}
-.cuadro-seccion-resumen {
-    background-color: #151922;
-    padding: 15px;
-    border-radius: 10px;
-    margin-bottom: 15px;
-    border-left: 4px solid #e65100;
-}
-.cuadro-seccion-preview {
-    background-color: #131722;
-    padding: 15px;
-    border-radius: 10px;
-    margin-bottom: 15px;
-    border-left: 4px solid #7b1fa2;
 }
 </style>
 """
@@ -202,31 +160,18 @@ col_datos, col_etiqueta = st.columns([1, 1])
 
 with col_datos:
     crear_encabezado_seccion("Configuracion Tecnica")
-    
-    # CUADRO 1: Modelo UPS
-    st.markdown('<div class="cuadro-seccion">', unsafe_allow_html=True)
-    modelo_seleccionado = st.selectbox("Modelo UPS:", options=list(CATALOGO_UPS.keys()))
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    # CUADRO 2: Familia
-    st.markdown('<div class="cuadro-seccion">', unsafe_allow_html=True)
-    familia_seleccionada = st.selectbox("Familia:", options=OPCIONES_FAMILIA)
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    # CUADRO 3: Voltaje Entrada
-    st.markdown('<div class="cuadro-seccion">', unsafe_allow_html=True)
-    voltaje_entrada = st.selectbox("Voltaje Entrada:", options=OPCIONES_VOLTAJE_ENTRADA)
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    # CUADRO 4: Voltaje Salida
-    st.markdown('<div class="cuadro-seccion">', unsafe_allow_html=True)
-    voltaje_salida = st.selectbox("Voltaje Salida:", options=OPCIONES_VOLTAJE_SALIDA)
-    st.markdown('</div>', unsafe_allow_html=True)
+    c1, c2 = st.columns(2)
+    with c1:
+        modelo_seleccionado = st.selectbox("Modelo UPS:", options=list(CATALOGO_UPS.keys()))
+        voltaje_entrada = st.selectbox("Voltaje Entrada:", options=OPCIONES_VOLTAJE_ENTRADA)
+    with c2:
+        familia_seleccionada = st.selectbox("Familia:", options=OPCIONES_FAMILIA)
+        voltaje_salida = st.selectbox("Voltaje Salida:", options=OPCIONES_VOLTAJE_SALIDA)
     
     es_mr1 = (familia_seleccionada == "MR1")
     vcc_val = st.number_input("Voltaje de Baterías (Vcc):", value=240, step=12, disabled=es_mr1)
     
-    # NUEVO: Cuadro de verificación para bloquear/desbloquear el tamaño de letra
+    # Cuadro de verificación para proteger el tamaño de letra de arrastres accidentales en móvil
     habilitar_letra = st.checkbox("⚙️ Habilitar ajuste de tamaño de letra", value=False)
     tamano_letra = st.slider("Tamaño de letra:", min_value=14, max_value=36, value=26, step=2, disabled=not habilitar_letra)
     
@@ -234,11 +179,11 @@ with col_datos:
     kva_val = int(datos_fijos["capacidad"].split("kVA")[0])
     texto_baterias_final = ("240Vcc" if es_mr1 else f"{vcc_val}Vcc") if kva_val >= 300 else ("240Vcc (+/-120Vcc)" if es_mr1 else f"{vcc_val}Vcc (+/-{vcc_val // 2}Vcc)")
 
-    # CUADRO CAPTURA
-    st.markdown('---')
-    st.markdown('<div class="cuadro-seccion-captura">', unsafe_allow_html=True)
+    st.markdown("---")
     crear_encabezado_seccion("Captura Portatil")
     cantidad = st.number_input("Equipos en lote:", value=1, min_value=1)
+    
+    # Serie de exactamente 9 dígitos que arranca en puros ceros
     num_serie_ini = st.text_input("Serie Inicial:", value="000000000", max_chars=9)
     
     es_serie_valida = len(num_serie_ini) == 9 and num_serie_ini.isdigit()
@@ -266,18 +211,14 @@ with col_datos:
             num_chino_final = st.text_input(f"Codigo interno {i+1}:", key=text_key)
             st.session_state.numeros_chinos[id_eq] = num_chino_final
         resumen_datos.append({"No. Equipo": f"Equipo {i+1}", "Número de Serie": f"{datos_fijos['modelo_corto']}-{serie_eq}", "Código Interno": num_chino_final if num_chino_final else "Sin Escanear"})
-    st.markdown('</div>', unsafe_allow_html=True)
 
-    # CUADRO RESUMEN
-    st.markdown('---')
-    st.markdown('<div class="cuadro-seccion-resumen">', unsafe_allow_html=True)
+    st.markdown("---")
     crear_encabezado_seccion("Resumen de Vinculacion")
     st.dataframe(pd.DataFrame(resumen_datos), use_container_width=True, hide_index=True)
     
     modelo_final = (modelo_seleccionado if familia_seleccionada == "Ninguno" else f"{modelo_seleccionado} {familia_seleccionada}")
     pdf_data = generar_pdf_reporte(resumen_datos, modelo_final, datos_fijos["capacidad"], voltaje_entrada, voltaje_salida)
     st.download_button(label="📄 Descargar Reporte (PDF)", data=pdf_data, file_name=f"reporte_{time.strftime('%Y%m%d')}.pdf", mime="application/pdf", disabled=not es_serie_valida)
-    st.markdown('</div>', unsafe_allow_html=True)
 
 # --- COLUMNA DE PREVISUALIZACIÓN ---
 unificado_zpl = ""
@@ -286,7 +227,6 @@ for idx, s in enumerate(lista_series):
     unificado_zpl += f"^XA^CI28{zpl_logo_industronic}^FO40,100^A0N,{tamano_letra},{tamano_letra}^FDEquipo: UPS^FS^FO40,135^A0N,{tamano_letra},{tamano_letra}^FDModelo: {modelo_final}^FS^FO40,170^A0N,{tamano_letra},{tamano_letra}^FDV.Entrada: {voltaje_entrada}^FS^FO40,205^A0N,{tamano_letra},{tamano_letra}^FDCapacidad: {datos_fijos['capacidad']}^FS^FO40,240^A0N,{tamano_letra},{tamano_letra}^FDV.Baterias: {texto_baterias_final}^FS^FO40,275^A0N,{tamano_letra},{tamano_letra}^FDV.Salida: {voltaje_salida}^FS^FO40,310^A0N,{tamano_letra},{tamano_letra}^FDSerie:^FS{zpl_logo_hecho_en_mexico}^FO360,310^BY2,2.5,65^BCN,65,Y,N,N^FD{datos_fijos['modelo_corto']}-{s}^FS^FO360,405^A0N,18,18^FDCodigo interno: {chino_v}^FS^XZ\n"
 
 with col_etiqueta:
-    st.markdown('<div class="cuadro-seccion-preview">', unsafe_allow_html=True)
     crear_encabezado_seccion("Previsualizacion")
     def preview(s, idx):
         chino_p = st.session_state.numeros_chinos.get(f"eq_{idx}", "56111105305CS4800001")
@@ -294,7 +234,6 @@ with col_etiqueta:
         return requests.post("http://api.labelary.com/v1/printers/8dpmm/labels/4x3/0/", data=z.encode('utf-8')).content
     st.image(preview(lista_series[0], 0), use_container_width=True)
     st.download_button(label=f"💾 Descargar Etiquetas ZPL", data=unificado_zpl, file_name="etiquetas.zpl", disabled=not es_serie_valida)
-    st.markdown('</div>', unsafe_allow_html=True)
 
 # --- JAVASCRIPT INVISIBLE PARA BLOQUEAR EL TECLADO EN LOS SELECTBOXES ---
 components.html(
