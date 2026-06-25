@@ -8,6 +8,9 @@ from PIL import Image
 from io import BytesIO
 import streamlit.components.v1 as components
 
+# --- NUEVA LIBRERÍA PARA LEER CÓDIGOS DE BARRAS ---
+from pyzbar.pyzbar import decode
+
 # --- LIBRERÍAS DE REPORTLAB PARA EL PDF ---
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
@@ -17,7 +20,7 @@ from reportlab.lib import colors
 # Configuración de la página web (Debe ir al principio)
 st.set_page_config(page_title="Industronic - Sistema de Etiquetas", layout="wide")
 
-# --- BLOQUE 1: LOGOTIPO Y TÍTULO (BLINDADO CONTRA RUPTURAS EN MÓVIL) ---
+# --- BLOQUE 1: LOGOTIPO Y TÍTULO ---
 header_html = """
 <div style="display: flex; align-items: center; margin-bottom: 8px;">
     <div style="
@@ -49,7 +52,7 @@ header_html = """
 """
 st.markdown(header_html, unsafe_allow_html=True)
 
-# --- BLOQUE 2: ESTILOS CSS AVANZADOS ---
+# --- BLOQUE 2: ESTILOS CSS ---
 css_estilo = """
 <style>
 .stApp { background-color: #0E1117; }
@@ -64,7 +67,7 @@ div.stButton > button:first-child {
     padding: 10px 20px !important; border-radius: 8px !important; width: 100%;
 }
 
-/* --- MAGIA CSS: CONVERTIR CÁMARA EN RANURA HORIZONTAL EXTRA FINA --- */
+/* --- CÁMARA TIPO ESCÁNER --- */
 [data-testid="stCameraInput"] {
     border: 2px solid #004dc3 !important;
     border-radius: 12px !important;
@@ -73,7 +76,7 @@ div.stButton > button:first-child {
 }
 [data-testid="stCameraInput"] video {
     object-fit: cover !important;
-    height: 70px !important; /* REBAJADO A 70px PARA HACERLO AÚN MÁS DELGADO */
+    height: 70px !important;
     width: 100% !important;
     border-radius: 8px !important;
 }
@@ -227,10 +230,32 @@ with col_datos:
         id_eq = f"eq_{i}"; text_key = f"in_{id_eq}"
         with st.expander(f"Equipo {i+1} - Serie: {serie_eq}", expanded=(i==0)):
             foto_cam = st.camera_input(f"Escanear Etiqueta (Eq {i+1})", key=f"cam_{id_eq}")
+            
+            # --- LÓGICA DE ESCANEO REAL ---
             if foto_cam is not None and st.session_state.get(f"proc_{id_eq}") is None:
-                st.session_state[text_key] = "501211007220S1800005"; st.session_state[f"proc_{id_eq}"] = True; st.rerun()
+                try:
+                    img_capturada = Image.open(foto_cam)
+                    codigos_detectados = decode(img_capturada)
+                    
+                    if codigos_detectados:
+                        # Si encuentra un código, lo extrae
+                        codigo_leido = codigos_detectados[0].data.decode('utf-8')
+                        st.session_state[text_key] = codigo_leido
+                        st.success(f"✅ ¡Código capturado: {codigo_leido}!")
+                    else:
+                        # Si no encuentra nada en la foto
+                        st.error("❌ No se detectó ningún código. Toma la foto de nuevo enfocando las barras.")
+                        
+                    st.session_state[f"proc_{id_eq}"] = True
+                    time.sleep(1) # Pequeña pausa para que el operador vea el mensaje
+                    st.rerun()
+                except Exception as e:
+                    st.error("Ocurrió un error al procesar la imagen.")
+                    st.session_state[f"proc_{id_eq}"] = True
+                    
             num_chino_final = st.text_input(f"Codigo interno {i+1}:", key=text_key)
             st.session_state.numeros_chinos[id_eq] = num_chino_final
+            
         resumen_datos.append({"No. Equipo": f"Equipo {i+1}", "Número de Serie": f"{datos_fijos['modelo_corto']}-{serie_eq}", "Código Interno": num_chino_final if num_chino_final else "Sin Escanear"})
 
     st.markdown("---")
