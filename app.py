@@ -16,75 +16,99 @@ from reportlab.lib import colors
 # Configuración de la página web (Debe ir al principio)
 st.set_page_config(page_title="Industronic - Sistema de Etiquetas", layout="wide")
 
-# --- BLOQUE 1: LOGOTIPO Y TÍTULO RESPONSIVO ---
+# --- BLOQUE 1: LOGOTIPO Y TÍTULO ULTRA RESPONSIVO ---
 header_html = """
-<div style="display: flex; align-items: center; margin-bottom: 10px;">
+<div style="display: flex; align-items: center; margin-bottom: 5px;">
     <div style="
         background-color: #004dc3; 
-        width: 35px; 
-        height: 35px; 
+        width: 30px; 
+        height: 30px; 
         border-radius: 50%; 
         display: flex; 
         justify-content: center; 
         align-items: center; 
-        margin-right: 10px;
-        box-shadow: 0 0 8px rgba(0,77,195,0.3);
+        margin-right: 8px;
     ">
-        <span style="color: white; font-family: 'Arial', sans-serif; font-size: 22px; font-weight: bold; letter-spacing: -1px;">!i</span>
+        <span style="color: white; font-family: 'Arial', sans-serif; font-size: 18px; font-weight: bold; letter-spacing: -1px;">!i</span>
     </div>
-    <span style="color: white; font-family: 'Segoe UI', sans-serif; font-size: 24px; font-weight: 500;">Industronic</span>
+    <span style="color: white; font-family: 'Segoe UI', sans-serif; font-size: 20px; font-weight: 500;">Industronic</span>
 </div>
 <h1 style="
     color: white; 
     font-family: 'Impact', sans-serif; 
-    font-size: 30px; 
+    font-size: 26px; 
     letter-spacing: 1px; 
     margin-top: -5px; 
-    margin-bottom: 10px;
+    margin-bottom: 15px;
     text-transform: uppercase;
-    line-height: 1;
+    line-height: 1.1;
 ">SISTEMA DE ETIQUETAS</h1>
-<hr style="border-top: 1px solid #444; margin-top: 0px; margin-bottom: 20px;">
 """
 st.markdown(header_html, unsafe_allow_html=True)
 
-# --- BLOQUE 2: ESTILOS CSS ---
+# --- BLOQUE 2: ESTILOS CSS PARA CONTENEDORES Y RADIOS ALINEADOS ---
 css_estilo = """
 <style>
 .stApp { background-color: #0E1117; }
+
+/* Ajustes generales de etiquetas */
 .stSelectbox label, .stTextInput label, .stNumberInput label, .stSlider label, .stRadio label {
-    font-size: 13px !important; font-weight: 600 !important; color: #F0F2F6 !important;
+    font-size: 13px !important; font-weight: 600 !important; color: #FFFFFF !important;
 }
+
 .stTextInput > div > div > input, .stNumberInput > div > div > input {
-    background-color: #1A1C23 !important; border: 1px solid #E0E0E0 !important; border-radius: 8px !important; color: white !important;
+    background-color: #1A1C23 !important; border: 1px solid #444 !important; border-radius: 8px !important; color: white !important;
 }
-/* Estilizar los radio buttons como botones táctiles móviles compactos */
+
+/* Forzar alineación vertical o en cuadrícula limpia de los radios en móvil */
 div[data-testid="stRadio"] > div {
-    flex-direction: row !important;
-    flex-wrap: wrap !important;
-    gap: 6px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 5px !important;
+    width: 100% !important;
 }
+
 div[data-testid="stRadio"] label {
     background-color: #1A1C23 !important;
-    padding: 4px 10px !important;
+    padding: 8px 12px !important;
     border-radius: 6px !important;
     border: 1px solid #333 !important;
     cursor: pointer !important;
-    font-size: 12px !important;
+    font-size: 13px !important;
+    display: flex !important;
+    width: 100% !important;
 }
+
+/* Ajuste específico para la Familia (que sí se puede ver en fila ordenada) */
+div[key="radio_familia"] div[data-testid="stRadio"] > div {
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+}
+div[key="radio_familia"] div[data-testid="stRadio"] label {
+    width: auto !important;
+}
+
+/* Diseño de botones principales */
 div.stButton > button:first-child {
     background-color: #004dc3 !important; color: white !important; border: none !important; font-weight: bold !important;
-    padding: 10px 20px !important; border-radius: 8px !important; width: 100%;
+    padding: 12px 20px !important; border-radius: 8px !important; width: 100%; font-size: 14px !important;
 }
 </style>
 """
 st.markdown(css_estilo, unsafe_allow_html=True)
 
-def crear_encabezado_seccion(titulo):
+# Función para dar formato visual a los cuadros contenedores
+def comenzar_cuadro_seccion(titulo, color_borde="#004dc3", color_fondo="#1E222D"):
     html = f"""
-    <div style="display: flex; align-items: center; margin-top: 5px; margin-bottom: 15px;">
-        <div style="background-color: #004dc3; width: 4px; height: 20px; border-radius: 2px; margin-right: 10px;"></div>
-        <h2 style="color: #FFFFFF; font-family: 'Segoe UI', sans-serif; font-size: 18px; font-weight: 600; margin: 0;">{titulo}</h2>
+    <div style="
+        background-color: {color_fondo}; 
+        padding: 15px; 
+        border-radius: 10px; 
+        border-left: 5px solid {color_borde}; 
+        margin-top: 15px; 
+        margin-bottom: 10px;
+    ">
+        <h2 style="color: #FFFFFF; font-family: 'Segoe UI', sans-serif; font-size: 16px; font-weight: 600; margin: 0;">{titulo}</h2>
     </div>
     """
     st.markdown(html, unsafe_allow_html=True)
@@ -147,7 +171,7 @@ def convertir_imagen_a_zpl(image_path, pos_x, pos_y, max_width=120, max_height=8
         return f"^FO{pos_x},{pos_y}^GFA,{total_bytes},{total_bytes},{bytes_per_row},{hex_data}^FS"
     except: return fallback_zpl
 
-# --- CATÁLOGOS COMPLETOS (18 MODELOS) ---
+# --- CATÁLOGOS COMPLETOS ---
 CATALOGO_UPS = {
     "1310": { "modelo_completo": "UPS-IND-HF-1310", "capacidad": "10kVA/10kW" },
     "1315": { "modelo_completo": "UPS-IND-HF-1315", "capacidad": "15kVA/15kW" },
@@ -157,8 +181,8 @@ CATALOGO_UPS = {
     "1360": { "modelo_completo": "UPS-IND-HF-1360", "capacidad": "60kVA/60kW" },
     "1380": { "modelo_completo": "UPS-IND-HF-1380", "capacidad": "80kVA/80kW" },
     "13100": { "modelo_completo": "UPS-IND-HF-13100", "capacidad": "100kVA/100kW" },
-    "1312": { "modelo_completo": "UPS-IND-HF-13120", "capacidad": "120kVA/120kW" },
-    "1316": { "modelo_completo": "UPS-IND-HF-13160", "capacidad": "160kVA/160kW" },
+    "13120": { "modelo_completo": "UPS-IND-HF-13120", "capacidad": "120kVA/120kW" },
+    "13160": { "modelo_completo": "UPS-IND-HF-13160", "capacidad": "160kVA/160kW" },
     "13200": { "modelo_completo": "UPS-IND-HF-13200", "capacidad": "200kVA/200kW" },
     "13300": { "modelo_completo": "UPS-IND-HF-13300", "capacidad": "300kVA/300kW" },
     "13400": { "modelo_completo": "UPS-IND-HF-13400", "capacidad": "400kVA/400kW" },
@@ -169,8 +193,7 @@ CATALOGO_UPS = {
     "131200": { "modelo_completo": "UPS-IND-HF-131200", "capacidad": "1200kVA/1200kW" }
 }
 
-# SEPARACIÓN ESTRUCTURADA DE VOLTAJES
-VOLTAJES_ESTRELLA = ["120_208", "127_220", "220_380", "230_400", "254_440", "265_460", "277_480"]
+VOLTAJES_ESTRELLA = ["120_208", "127_220", "220_380", "230_400", "254/440", "265_460", "277_480"]
 VOLTAJES_DELTA = ["208D", "220D", "380D", "400D", "440D", "460D", "480D"]
 OPCIONES_FAMILIA = ["M1", "Ninguno", "N1", "R1", "MR1"]
 
@@ -179,61 +202,55 @@ zpl_logo_hecho_en_mexico = convertir_imagen_a_zpl("hecho_en_mexico.png", 40, 365
 
 if "numeros_chinos" not in st.session_state: st.session_state.numeros_chinos = {}
 
-# --- LAYOUT PRINCIPAL ---
-col_datos, col_etiqueta = st.columns([1, 1])
-
-with col_datos:
-    crear_encabezado_seccion("Configuracion Tecnica")
-    
-    # 1. Selección de Modelos (Los 18 disponibles)
+# --- CUADRO 1: CONFIGURACIÓN TÉCNICA (Borde Azul Eléctrico) ---
+comenzar_cuadro_seccion("1. CONFIGURACIÓN TÉCNICA BASE", color_borde="#004dc3", color_fondo="#141824")
+with st.container():
     modelo_seleccionado = st.radio(
-        "Modelo UPS Industronic:", 
+        "Modelo UPS:", 
         options=list(CATALOGO_UPS.keys()), 
-        format_func=lambda x: CATALOGO_UPS[x]["modelo_completo"],
-        horizontal=True
+        format_func=lambda x: CATALOGO_UPS[x]["modelo_completo"]
     )
     
-    # 2. Selección de Familia
-    familia_seleccionada = st.radio("Familia:", options=OPCIONES_FAMILIA, horizontal=True)
+    # Familia agrupada de forma horizontal compacta
+    st.markdown('<div key="radio_familia">', unsafe_allow_html=True)
+    familia_seleccionada = st.radio("Familia:", options=OPCIONES_FAMILIA)
+    st.markdown('</div>', unsafe_allow_html=True)
     
-    # 3. Bloque de Voltaje de Entrada Organizado
-    st.markdown("<p style='font-size:13px; font-weight:600; color:#F0F2F6; margin-bottom:2px;'>Voltaje Entrada:</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size:13px; font-weight:600; color:#FFF; margin-top:10px;'>Voltajes de Entrada:</p>", unsafe_allow_html=True)
     c_in_y, c_in_d = st.columns(2)
     with c_in_y:
-        v_ent_y = st.radio("Estrella (Y)", options=VOLTAJES_ESTRELLA, format_func=lambda x: f"{x.replace('_', '/')}Vca(+/-20%)", key="v_in_y")
+        v_ent_y = st.radio("Estrella (Y)", options=VOLTAJES_ESTRELLA, format_func=lambda x: f"{x.replace('_', '/')}Vca", key="v_in_y")
     with c_in_d:
-        v_ent_d = st.radio("Delta (D)", options=VOLTAJES_DELTA, format_func=lambda x: f"{x}Vca(+/-20%)", key="v_in_d")
+        v_ent_d = st.radio("Delta (D)", options=VOLTAJES_DELTA, format_func=lambda x: f"{x}Vca", key="v_in_d")
     
-    # Interruptor lógico oculto para decidir cuál tomó el usuario
-    tipo_in = st.radio("Tipo Conexión Entrada:", options=["Estrella", "Delta"], horizontal=True, label_visibility="collapsed")
+    tipo_in = st.radio("Conexión Entrada Activa:", options=["Estrella", "Delta"], horizontal=True)
     voltaje_entrada_final = v_ent_y if tipo_in == "Estrella" else v_ent_d
     v_entrada_label = f"{voltaje_entrada_final.replace('_', '/')}Vca(+/-20%)"
 
-    # 4. Bloque de Voltaje de Salida Organizado
-    st.markdown("<p style='font-size:13px; font-weight:600; color:#F0F2F6; margin-bottom:2px;'>Voltaje Salida:</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size:13px; font-weight:600; color:#FFF; margin-top:10px;'>Voltajes de Salida:</p>", unsafe_allow_html=True)
     c_out_y, c_out_d = st.columns(2)
     with c_out_y:
-        v_sal_y = st.radio("Estrella (Y)", options=VOLTAJES_ESTRELLA, format_func=lambda x: f"{x.replace('_', '/')}Vca(+/-1%)", key="v_out_y")
+        v_sal_y = st.radio("Estrella (Y)", options=VOLTAJES_ESTRELLA, format_func=lambda x: f"{x.replace('_', '/')}Vca", key="v_out_y")
     with c_out_d:
-        v_sal_d = st.radio("Delta (D)", options=VOLTAJES_DELTA, format_func=lambda x: f"{x}Vca(+/-1%)", key="v_out_d")
+        v_sal_d = st.radio("Delta (D)", options=VOLTAJES_DELTA, format_func=lambda x: f"{x}Vca", key="v_out_d")
         
-    tipo_out = st.radio("Tipo Conexión Salida:", options=["Estrella", "Delta"], horizontal=True, label_visibility="collapsed")
+    tipo_out = st.radio("Conexión Salida Activa:", options=["Estrella", "Delta"], horizontal=True)
     voltaje_salida_final = v_sal_y if tipo_out == "Estrella" else v_sal_d
     v_salida_label = f"{voltaje_salida_final.replace('_', '/')}Vca(+/-1%)"
 
-    # Resto de parámetros fijos
     es_mr1 = (familia_seleccionada == "MR1")
     vcc_val = st.number_input("Voltaje de Baterías (Vcc):", value=240, step=12)
-    tamano_letra = st.slider("Tamaño de letra especificaciones:", min_value=14, max_value=36, value=26, step=2)
+    tamano_letra = st.slider("Tamaño de letra en etiqueta:", min_value=14, max_value=36, value=26, step=2)
     
     datos_fijos = CATALOGO_UPS[modelo_seleccionado]
     kva_val = int(datos_fijos["capacidad"].split("kVA")[0])
     texto_baterias_final = ("240Vcc" if es_mr1 else f"{vcc_val}Vcc") if kva_val >= 300 else ("240Vcc (+/-120Vcc)" if es_mr1 else f"{vcc_val}Vcc (+/-{vcc_val // 2}Vcc)")
 
-    st.markdown("---")
-    crear_encabezado_seccion("Captura Portatil")
+# --- CUADRO 2: CAPTURA PORTÁTIL (Borde Verde Esmeralda) ---
+comenzar_cuadro_seccion("2. CONTROL DE LOTE Y ESCANEO", color_borde="#2e7d32", color_fondo="#111622")
+with st.container():
     cantidad = st.number_input("Equipos en lote:", value=1, min_value=1)
-    num_serie_ini = st.text_input("Serie Inicial:", value="140426381")
+    num_serie_ini = st.text_input("Serie Inicial Industronic:", value="140426381")
     
     lista_series = []
     try:
@@ -245,33 +262,36 @@ with col_datos:
     for i in range(int(cantidad)):
         serie_eq = lista_series[i] if i < len(lista_series) else num_serie_ini
         id_eq = f"eq_{i}"; text_key = f"in_{id_eq}"
-        with st.expander(f"Equipo {i+1} - Serie: {serie_eq}", expanded=(i==0)):
-            foto_cam = st.camera_input(f"Escanear (Eq {i+1})", key=f"cam_{id_eq}")
+        with st.expander(f"📷 Escáner Unidad {i+1} - Serie: {serie_eq}", expanded=(i==0)):
+            foto_cam = st.camera_input(f"Capturar Código", key=f"cam_{id_eq}")
             if foto_cam is not None and st.session_state.get(f"proc_{id_eq}") is None:
                 st.session_state[text_key] = "501211007220S1800005"; st.session_state[f"proc_{id_eq}"] = True; st.rerun()
-            num_chino_final = st.text_input(f"Codigo interno {i+1}:", key=text_key)
+            num_chino_final = st.text_input(f"Código interno {i+1}:", key=text_key)
             st.session_state.numeros_chinos[id_eq] = num_chino_final
         resumen_datos.append({"No. Equipo": f"Equipo {i+1}", "Número de Serie": f"{modelo_seleccionado}-{serie_eq}", "Código Interno": num_chino_final if num_chino_final else "Sin Escanear"})
 
-    st.markdown("---")
-    crear_encabezado_seccion("Resumen de Vinculacion")
+# --- CUADRO 3: RESUMEN Y EXPORTACIÓN (Borde Naranja) ---
+comenzar_cuadro_seccion("3. RESUMEN DE VINCULACIÓN Y REPORTES", color_borde="#e65100", color_fondo="#151922")
+with st.container():
     st.dataframe(pd.DataFrame(resumen_datos), use_container_width=True, hide_index=True)
     
     modelo_final = (datos_fijos["modelo_completo"] if familia_seleccionada == "Ninguno" else f"{datos_fijos['modelo_completo']} {familia_seleccionada}")
     pdf_data = generar_pdf_reporte(resumen_datos, modelo_final, datos_fijos["capacidad"], v_entrada_label, v_salida_label)
-    st.download_button(label="📄 Descargar Reporte (PDF)", data=pdf_data, file_name=f"reporte_{time.strftime('%Y%m%d')}.pdf", mime="application/pdf")
+    st.download_button(label="📄 Descargar Reporte Completo (PDF)", data=pdf_data, file_name=f"reporte_{time.strftime('%Y%m%d')}.pdf", mime="application/pdf")
 
-# --- COLUMNA DE PREVISUALIZACIÓN ---
-unificado_zpl = ""
-for idx, s in enumerate(lista_series):
-    chino_v = st.session_state.numeros_chinos.get(f"eq_{idx}", "56111105305CS4800001")
-    unificado_zpl += f"^XA^CI28{zpl_logo_industronic}^FO40,100^A0N,{tamano_letra},{tamano_letra}^FDEquipo: UPS^FS^FO40,135^A0N,{tamano_letra},{tamano_letra}^FDModelo: {modelo_final}^FS^FO40,170^A0N,{tamano_letra},{tamano_letra}^FDV.Entrada: {v_entrada_label}^FS^FO40,205^A0N,{tamano_letra},{tamano_letra}^FDCapacidad: {datos_fijos['capacidad']}^FS^FO40,240^A0N,{tamano_letra},{tamano_letra}^FDV.Baterias: {texto_baterias_final}^FS^FO40,275^A0N,{tamano_letra},{tamano_letra}^FDV.Salida: {v_salida_label}^FS^FO40,310^A0N,{tamano_letra},{tamano_letra}^FDSerie:^FS{zpl_logo_hecho_en_mexico}^FO360,310^BY2,2.5,65^BCN,65,Y,N,N^FD{modelo_seleccionado}-{s}^FS^FO360,405^A0N,18,18^FDCodigo interno: {chino_v}^FS^XZ\n"
+# --- BLOQUE DE PREVISUALIZACIÓN DE ETIQUETA ---
+st.markdown("<br>", unsafe_allow_html=True)
+comenzar_cuadro_seccion("4. ARCHIVO DE SALIDA ZPL", color_borde="#7b1fa2", color_fondo="#131722")
+with st.container():
+    unificado_zpl = ""
+    for idx, s in enumerate(lista_series):
+        chino_v = st.session_state.numeros_chinos.get(f"eq_{idx}", "56111105305CS4800001")
+        unificado_zpl += f"^XA^CI28{zpl_logo_industronic}^FO40,100^A0N,{tamano_letra},{tamano_letra}^FDEquipo: UPS^FS^FO40,135^A0N,{tamano_letra},{tamano_letra}^FDModelo: {modelo_final}^FS^FO40,170^A0N,{tamano_letra},{tamano_letra}^FDV.Entrada: {v_entrada_label}^FS^FO40,205^A0N,{tamano_letra},{tamano_letra}^FDCapacidad: {datos_fijos['capacidad']}^FS^FO40,240^A0N,{tamano_letra},{tamano_letra}^FDV.Baterias: {texto_baterias_final}^FS^FO40,275^A0N,{tamano_letra},{tamano_letra}^FDV.Salida: {v_salida_label}^FS^FO40,310^A0N,{tamano_letra},{tamano_letra}^FDSerie:^FS{zpl_logo_hecho_en_mexico}^FO360,310^BY2,2.5,65^BCN,65,Y,N,N^FD{modelo_seleccionado}-{s}^FS^FO360,405^A0N,18,18^FDCodigo interno: {chino_v}^FS^XZ\n"
 
-with col_etiqueta:
-    crear_encabezado_seccion("Previsualizacion")
     def preview(s, idx):
         chino_p = st.session_state.numeros_chinos.get(f"eq_{idx}", "56111105305CS4800001")
         z = f"^XA^CI28{zpl_logo_industronic}^FO40,100^A0N,{tamano_letra},{tamano_letra}^FDEquipo: UPS^FS^FO40,135^A0N,{tamano_letra},{tamano_letra}^FDModelo: {modelo_final}^FS^FO40,170^A0N,{tamano_letra},{tamano_letra}^FDV.Entrada: {v_entrada_label}^FS^FO40,205^A0N,{tamano_letra},{tamano_letra}^FDCapacidad: {datos_fijos['capacidad']}^FS^FO40,240^A0N,{tamano_letra},{tamano_letra}^FDV.Baterias: {texto_baterias_final}^FS^FO40,275^A0N,{tamano_letra},{tamano_letra}^FDV.Salida: {v_salida_label}^FS^FO40,310^A0N,{tamano_letra},{tamano_letra}^FDSerie:^FS{zpl_logo_hecho_en_mexico}^FO360,310^BY2,2.5,65^BCN,65,Y,N,N^FD{modelo_seleccionado}-{s}^FS^FO360,405^A0N,18,18^FDCodigo interno: {chino_p}^FS^XZ"
         return requests.post("http://api.labelary.com/v1/printers/8dpmm/labels/4x3/0/", data=z.encode('utf-8')).content
+    
     st.image(preview(lista_series[0], 0), use_container_width=True)
-    st.download_button(label=f"💾 Descargar Etiquetas ZPL", data=unificado_zpl, file_name="etiquetas.zpl")
+    st.download_button(label=f"💾 Descargar Código de Impresión (.ZPL)", data=unificado_zpl, file_name="etiquetas.zpl")
