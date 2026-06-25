@@ -43,7 +43,7 @@ header_html = """
     margin-top: 5px; 
     margin-bottom: 10px; 
     text-transform: uppercase;
-    white-space: nowrap; /* PROHÍBE QUE EL TEXTO SE ROMPA EN VARIOS RENGLONES */
+    white-space: nowrap;
 ">SISTEMA DE ETIQUETAS</h1>
 <hr style="border-top: 1px solid #444; margin-top: 0px; margin-bottom: 20px;">
 """
@@ -64,17 +64,17 @@ div.stButton > button:first-child {
     padding: 10px 20px !important; border-radius: 8px !important; width: 100%;
 }
 
-/* --- MAGIA CSS: CONVERTIR CÁMARA EN RANURA HORIZONTAL --- */
+/* --- MAGIA CSS: CONVERTIR CÁMARA EN RANURA HORIZONTAL EXTRA FINA --- */
 [data-testid="stCameraInput"] {
-    border: 2px solid #004dc3 !important; /* Marco azul tipo escáner */
+    border: 2px solid #004dc3 !important;
     border-radius: 12px !important;
     padding: 5px !important;
     background-color: #1A1C23 !important;
 }
 [data-testid="stCameraInput"] video {
-    object-fit: cover !important; /* Hace zoom para llenar el rectángulo sin aplastar la imagen */
-    height: 120px !important; /* Altura súper corta como ranura de escáner */
-    width: 100% !important; /* Que abarque todo el ancho posible */
+    object-fit: cover !important;
+    height: 70px !important; /* REBAJADO A 70px PARA HACERLO AÚN MÁS DELGADO */
+    width: 100% !important;
     border-radius: 8px !important;
 }
 </style>
@@ -226,7 +226,6 @@ with col_datos:
         serie_eq = lista_series[i] if i < len(lista_series) else "000000000"
         id_eq = f"eq_{i}"; text_key = f"in_{id_eq}"
         with st.expander(f"Equipo {i+1} - Serie: {serie_eq}", expanded=(i==0)):
-            # Aquí es donde se renderiza la cámara. Gracias al CSS de arriba, se verá como una ranura horizontal.
             foto_cam = st.camera_input(f"Escanear Etiqueta (Eq {i+1})", key=f"cam_{id_eq}")
             if foto_cam is not None and st.session_state.get(f"proc_{id_eq}") is None:
                 st.session_state[text_key] = "501211007220S1800005"; st.session_state[f"proc_{id_eq}"] = True; st.rerun()
