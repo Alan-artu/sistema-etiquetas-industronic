@@ -133,31 +133,29 @@ def convertir_imagen_a_zpl(image_path, pos_x, pos_y, max_width=120, max_height=8
         return f"^FO{pos_x},{pos_y}^GFA,{total_bytes},{total_bytes},{bytes_per_row},{hex_data}^FS"
     except: return fallback_zpl
 
-# --- CATÁLOGOS ---
+# --- CATÁLOGOS CON CLAVES LIMPIAS DE TEXTO ---
 CATALOGO_UPS = {
-    "UPS-IND-HF-1310": { "modelo_corto": "1310", "capacidad": "10kVA/10kW" },
-    "UPS-IND-HF-1315": { "modelo_corto": "1315", "capacidad": "15kVA/15kW" },
-    "UPS-IND-HF-1320": { "modelo_corto": "1320", "capacidad": "20kVA/20kW" },
-    "UPS-IND-HF-1330": { "modelo_corto": "1330", "capacidad": "30kVA/30kW" },
-    "UPS-IND-HF-1340": { "modelo_corto": "1340", "capacidad": "40kVA/40kW" },
-    "UPS-IND-HF-1360": { "modelo_corto": "1360", "capacidad": "60kVA/60kW" },
-    "UPS-IND-HF-1380": { "modelo_corto": "1380", "capacidad": "80kVA/80kW" },
-    "UPS-IND-HF-13100": { "modelo_corto": "13100", "capacidad": "100kVA/100kW" },
-    "UPS-IND-HF-13120": { "modelo_corto": "13120", "capacidad": "120kVA/120kW" },
-    "UPS-IND-HF-13160": { "modelo_corto": "13160", "capacidad": "160kVA/160kW" },
-    "UPS-IND-HF-13200": { "modelo_corto": "13200", "capacidad": "200kVA/200kW" },
-    "UPS-IND-HF-13300": { "modelo_corto": "13300", "capacidad": "300kVA/300kW" },
-    "UPS-IND-HF-13400": { "modelo_corto": "13400", "capacidad": "400kVA/400kW" },
-    "UPS-IND-HF-13500": { "modelo_corto": "13500", "capacidad": "500kVA/500kW" },
-    "UPS-IND-HF-13600": { "modelo_corto": "13600", "capacidad": "600kVA/600kW" },
-    "UPS-IND-HF-13800": { "modelo_corto": "13800", "capacidad": "800kVA/800kW" },
-    "UPS-IND-HF-131000": { "modelo_corto": "131000", "capacidad": "1000kVA/1000kW" },
-    "UPS-IND-HF-131200": { "modelo_corto": "131200", "capacidad": "1200kVA/1200kW" }
+    "1310": { "modelo_completo": "UPS-IND-HF-1310", "capacidad": "10kVA/10kW" },
+    "1315": { "modelo_completo": "UPS-IND-HF-1315", "capacidad": "15kVA/15kW" },
+    "1320": { "modelo_completo": "UPS-IND-HF-1320", "capacidad": "20kVA/20kW" },
+    "1330": { "modelo_completo": "UPS-IND-HF-1330", "capacidad": "30kVA/30kW" },
+    "1340": { "modelo_completo": "UPS-IND-HF-1340", "capacidad": "40kVA/40kW" },
+    "1360": { "modelo_completo": "UPS-IND-HF-1360", "capacidad": "60kVA/60kW" },
+    "1380": { "modelo_completo": "UPS-IND-HF-1380", "capacidad": "80kVA/80kW" },
+    "13100": { "modelo_completo": "UPS-IND-HF-13100", "capacidad": "100kVA/100kW" },
+    "13120": { "modelo_completo": "UPS-IND-HF-13120", "capacidad": "120kVA/120kW" },
+    "13160": { "modelo_completo": "UPS-IND-HF-13160", "capacidad": "160kVA/160kW" },
+    "13200": { "modelo_completo": "UPS-IND-HF-13200", "capacidad": "200kVA/200kW" },
+    "13300": { "modelo_completo": "UPS-IND-HF-13300", "capacidad": "300kVA/300kW" },
+    "13400": { "modelo_completo": "UPS-IND-HF-13400", "capacidad": "400kVA/400kW" },
+    "13500": { "modelo_completo": "UPS-IND-HF-13500", "capacidad": "500kVA/500kW" },
+    "13600": { "modelo_completo": "UPS-IND-HF-13600", "capacidad": "600kVA/600kW" },
+    "13800": { "modelo_completo": "UPS-IND-HF-13800", "capacidad": "800kVA/800kW" },
+    "131000": { "modelo_completo": "UPS-IND-HF-131000", "capacidad": "1000kVA/1000kW" },
+    "131200": { "modelo_completo": "UPS-IND-HF-131200", "capacidad": "1200kVA/1200kW" }
 }
 
-VOLTAJES_BASE = ["120/208", "127/220", "220/380", "230/400", "254/440", "265/460", "277/480", "208D", "220D", "380D", "400D", "440D", "460D", "480D"]
-OPCIONES_VOLTAJE_ENTRADA = [f"{v}Vca(+/-20%)" for v in VOLTAJES_BASE]
-OPCIONES_VOLTAJE_SALIDA = [f"{v}Vca(+/-1%)" for v in VOLTAJES_BASE]
+VOLTAJES_BASE = ["120_208", "127_220", "220_380", "230_400", "254_440", "265_460", "277_480", "208D", "220D", "380D", "400D", "440D", "460D", "480D"]
 OPCIONES_FAMILIA = ["M1", "Ninguno", "N1", "R1", "MR1"]
 
 zpl_logo_industronic = convertir_imagen_a_zpl("logo_industronic.png", 40, 30, 300, 60, "^FO40,40^A0N,36,36^FDINDUSTronic^FS")
@@ -172,13 +170,24 @@ with col_datos:
     crear_encabezado_seccion("Configuracion Tecnica")
     c1, c2 = st.columns(2)
     with c1:
-        # CORRECCIÓN: Desbloqueados para que se puedan desplegar normalmente en producción
-        modelo_seleccionado = st.selectbox("Modelo UPS:", options=list(CATALOGO_UPS.keys()))
-        voltaje_entrada = st.selectbox("Voltaje Entrada:", options=OPCIONES_VOLTAJE_ENTRADA)
+        # TRUCO MÓVIL: Usamos texto plano en la lista y le damos formato visual con format_func
+        modelo_seleccionado = st.selectbox(
+            "Modelo UPS:", 
+            options=list(CATALOGO_UPS.keys()), 
+            format_func=lambda x: CATALOGO_UPS[x]["modelo_completo"]
+        )
+        voltaje_entrada = st.selectbox(
+            "Voltaje Entrada:", 
+            options=VOLTAJES_BASE, 
+            format_func=lambda x: f"{x.replace('_', '/')}Vca(+/-20%)"
+        )
     with c2:
-        # CORRECCIÓN: Desbloqueados para que se puedan desplegar normalmente en producción
         familia_seleccionada = st.selectbox("Familia:", options=OPCIONES_FAMILIA)
-        voltaje_salida = st.selectbox("Voltaje Salida:", options=OPCIONES_VOLTAJE_SALIDA)
+        voltaje_salida = st.selectbox(
+            "Voltaje Salida:", 
+            options=VOLTAJES_BASE, 
+            format_func=lambda x: f"{x.replace('_', '/')}Vca(+/-1%)"
+        )
     
     es_mr1 = (familia_seleccionada == "MR1")
     vcc_val = st.number_input("Voltaje de Baterías (Vcc):", value=240, step=12)
@@ -209,27 +218,30 @@ with col_datos:
                 st.session_state[text_key] = "501211007220S1800005"; st.session_state[f"proc_{id_eq}"] = True; st.rerun()
             num_chino_final = st.text_input(f"Codigo interno {i+1}:", key=text_key)
             st.session_state.numeros_chinos[id_eq] = num_chino_final
-        resumen_datos.append({"No. Equipo": f"Equipo {i+1}", "Número de Serie": f"{datos_fijos['modelo_corto']}-{serie_eq}", "Código Interno": num_chino_final if num_chino_final else "Sin Escanear"})
+        resumen_datos.append({"No. Equipo": f"Equipo {i+1}", "Número de Serie": f"{modelo_seleccionado}-{serie_eq}", "Código Interno": num_chino_final if num_chino_final else "Sin Escanear"})
 
     st.markdown("---")
     crear_encabezado_seccion("Resumen de Vinculacion")
     st.dataframe(pd.DataFrame(resumen_datos), use_container_width=True, hide_index=True)
     
-    modelo_final = (modelo_seleccionado if familia_seleccionada == "Ninguno" else f"{modelo_seleccionado} {familia_seleccionada}")
-    pdf_data = generar_pdf_reporte(resumen_datos, modelo_final, datos_fijos["capacidad"], voltaje_entrada, voltaje_salida)
+    modelo_final = (datos_fijos["modelo_completo"] if familia_seleccionada == "Ninguno" else f"{datos_fijos['modelo_completo']} {familia_seleccionada}")
+    v_entrada_str = f"{voltaje_entrada.replace('_', '/')}Vca(+/-20%)"
+    v_salida_str = f"{voltaje_salida.replace('_', '/')}Vca(+/-1%)"
+    
+    pdf_data = generar_pdf_reporte(resumen_datos, modelo_final, datos_fijos["capacidad"], v_entrada_str, v_salida_str)
     st.download_button(label="📄 Descargar Reporte (PDF)", data=pdf_data, file_name=f"reporte_{time.strftime('%Y%m%d')}.pdf", mime="application/pdf")
 
 # --- COLUMNA DE PREVISUALIZACIÓN ---
 unificado_zpl = ""
 for idx, s in enumerate(lista_series):
     chino_v = st.session_state.numeros_chinos.get(f"eq_{idx}", "56111105305CS4800001")
-    unificado_zpl += f"^XA^CI28{zpl_logo_industronic}^FO40,100^A0N,{tamano_letra},{tamano_letra}^FDEquipo: UPS^FS^FO40,135^A0N,{tamano_letra},{tamano_letra}^FDModelo: {modelo_final}^FS^FO40,170^A0N,{tamano_letra},{tamano_letra}^FDV.Entrada: {voltaje_entrada}^FS^FO40,205^A0N,{tamano_letra},{tamano_letra}^FDCapacidad: {datos_fijos['capacidad']}^FS^FO40,240^A0N,{tamano_letra},{tamano_letra}^FDV.Baterias: {texto_baterias_final}^FS^FO40,275^A0N,{tamano_letra},{tamano_letra}^FDV.Salida: {voltaje_salida}^FS^FO40,310^A0N,{tamano_letra},{tamano_letra}^FDSerie:^FS{zpl_logo_hecho_en_mexico}^FO360,310^BY2,2.5,65^BCN,65,Y,N,N^FD{datos_fijos['modelo_corto']}-{s}^FS^FO360,405^A0N,18,18^FDCodigo interno: {chino_v}^FS^XZ\n"
+    unificado_zpl += f"^XA^CI28{zpl_logo_industronic}^FO40,100^A0N,{tamano_letra},{tamano_letra}^FDEquipo: UPS^FS^FO40,135^A0N,{tamano_letra},{tamano_letra}^FDModelo: {modelo_final}^FS^FO40,170^A0N,{tamano_letra},{tamano_letra}^FDV.Entrada: {v_entrada_str}^FS^FO40,205^A0N,{tamano_letra},{tamano_letra}^FDCapacidad: {datos_fijos['capacidad']}^FS^FO40,240^A0N,{tamano_letra},{tamano_letra}^FDV.Baterias: {texto_baterias_final}^FS^FO40,275^A0N,{tamano_letra},{tamano_letra}^FDV.Salida: {v_salida_str}^FS^FO40,310^A0N,{tamano_letra},{tamano_letra}^FDSerie:^FS{zpl_logo_hecho_en_mexico}^FO360,310^BY2,2.5,65^BCN,65,Y,N,N^FD{modelo_seleccionado}-{s}^FS^FO360,405^A0N,18,18^FDCodigo interno: {chino_v}^FS^XZ\n"
 
 with col_etiqueta:
     crear_encabezado_seccion("Previsualizacion")
     def preview(s, idx):
         chino_p = st.session_state.numeros_chinos.get(f"eq_{idx}", "56111105305CS4800001")
-        z = f"^XA^CI28{zpl_logo_industronic}^FO40,100^A0N,{tamano_letra},{tamano_letra}^FDEquipo: UPS^FS^FO40,135^A0N,{tamano_letra},{tamano_letra}^FDModelo: {modelo_final}^FS^FO40,170^A0N,{tamano_letra},{tamano_letra}^FDV.Entrada: {voltaje_entrada}^FS^FO40,205^A0N,{tamano_letra},{tamano_letra}^FDCapacidad: {datos_fijos['capacidad']}^FS^FO40,240^A0N,{tamano_letra},{tamano_letra}^FDV.Baterias: {texto_baterias_final}^FS^FO40,275^A0N,{tamano_letra},{tamano_letra}^FDV.Salida: {voltaje_salida}^FS^FO40,310^A0N,{tamano_letra},{tamano_letra}^FDSerie:^FS{zpl_logo_hecho_en_mexico}^FO360,310^BY2,2.5,65^BCN,65,Y,N,N^FD{datos_fijos['modelo_corto']}-{s}^FS^FO360,405^A0N,18,18^FDCodigo interno: {chino_p}^FS^XZ"
+        z = f"^XA^CI28{zpl_logo_industronic}^FO40,100^A0N,{tamano_letra},{tamano_letra}^FDEquipo: UPS^FS^FO40,135^A0N,{tamano_letra},{tamano_letra}^FDModelo: {modelo_final}^FS^FO40,170^A0N,{tamano_letra},{tamano_letra}^FDV.Entrada: {v_entrada_str}^FS^FO40,205^A0N,{tamano_letra},{tamano_letra}^FDCapacidad: {datos_fijos['capacidad']}^FS^FO40,240^A0N,{tamano_letra},{tamano_letra}^FDV.Baterias: {texto_baterias_final}^FS^FO40,275^A0N,{tamano_letra},{tamano_letra}^FDV.Salida: {v_salida_str}^FS^FO40,310^A0N,{tamano_letra},{tamano_letra}^FDSerie:^FS{zpl_logo_hecho_en_mexico}^FO360,310^BY2,2.5,65^BCN,65,Y,N,N^FD{modelo_seleccionado}-{s}^FS^FO360,405^A0N,18,18^FDCodigo interno: {chino_p}^FS^XZ"
         return requests.post("http://api.labelary.com/v1/printers/8dpmm/labels/4x3/0/", data=z.encode('utf-8')).content
     st.image(preview(lista_series[0], 0), use_container_width=True)
     st.download_button(label=f"💾 Descargar Etiquetas ZPL", data=unificado_zpl, file_name="etiquetas.zpl")
