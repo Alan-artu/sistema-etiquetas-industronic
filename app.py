@@ -16,7 +16,7 @@ from reportlab.lib import colors
 # Configuración de la página web (Debe ir al principio)
 st.set_page_config(page_title="Industronic - Sistema de Etiquetas", layout="wide")
 
-# --- BLOQUE 1: LOGOTIPO Y TÍTULO AJUSTADO PARA MÓVIL ---
+# --- BLOQUE 1: LOGOTIPO Y TÍTULO RESPONSIVO ---
 header_html = """
 <div style="display: flex; align-items: center; margin-bottom: 10px;">
     <div style="
@@ -172,16 +172,16 @@ with col_datos:
     crear_encabezado_seccion("Configuracion Tecnica")
     c1, c2 = st.columns(2)
     with c1:
-        # BLOQUEO DE EDICIÓN: Agregado disabled=True para evitar apertura de teclado en móvil
-        modelo_seleccionado = st.selectbox("Modelo UPS:", options=list(CATALOGO_UPS.keys()), disabled=True)
-        voltaje_entrada = st.selectbox("Voltaje Entrada:", options=OPCIONES_VOLTAJE_ENTRADA, disabled=True)
+        # CORRECCIÓN: Desbloqueados para que se puedan desplegar normalmente en producción
+        modelo_seleccionado = st.selectbox("Modelo UPS:", options=list(CATALOGO_UPS.keys()))
+        voltaje_entrada = st.selectbox("Voltaje Entrada:", options=OPCIONES_VOLTAJE_ENTRADA)
     with c2:
-        # BLOQUEO DE EDICIÓN: Agregado disabled=True para evitar apertura de teclado en móvil
-        familia_seleccionada = st.selectbox("Familia:", options=OPCIONES_FAMILIA, disabled=True)
-        voltaje_salida = st.selectbox("Voltaje Salida:", options=OPCIONES_VOLTAJE_SALIDA, disabled=True)
+        # CORRECCIÓN: Desbloqueados para que se puedan desplegar normalmente en producción
+        familia_seleccionada = st.selectbox("Familia:", options=OPCIONES_FAMILIA)
+        voltaje_salida = st.selectbox("Voltaje Salida:", options=OPCIONES_VOLTAJE_SALIDA)
     
     es_mr1 = (familia_seleccionada == "MR1")
-    vcc_val = st.number_input("Voltaje de Baterías (Vcc):", value=240, step=12, disabled=True)
+    vcc_val = st.number_input("Voltaje de Baterías (Vcc):", value=240, step=12)
     tamano_letra = st.slider("Tamaño de letra:", min_value=14, max_value=36, value=26, step=2)
     
     datos_fijos = CATALOGO_UPS[modelo_seleccionado]
