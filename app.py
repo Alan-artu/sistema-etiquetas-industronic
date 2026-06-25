@@ -179,7 +179,7 @@ def convertir_imagen_a_zpl(image_path, pos_x, pos_y, max_width=120, max_height=8
         return f"^FO{pos_x},{pos_y}^GFA,{total_bytes},{total_bytes},{bytes_per_row},{hex_data}^FS"
     except Exception: return fallback_zpl
 
-# --- CATÁLOGOS COMPLETOS RESTAURADOS ---
+# --- CATÁLOGOS COMPLETOS ---
 CATALOGO_UPS = {
     "UPS-IND-HF-1310": { "modelo_corto": "1310", "capacidad": "10kVA/10kW" },
     "UPS-IND-HF-1315": { "modelo_corto": "1315", "capacidad": "15kVA/15kW" },
@@ -338,5 +338,3 @@ with col_etiqueta:
 
     st.markdown("<br>", unsafe_allow_html=True)
     st.download_button(f"Descargar {cantidad} etiquetas (ZPL)", unificado_zpl, file_name="etiquetas_industronic.zpl", use_container_width=True)
-streamlit
-reportlab
