@@ -26,7 +26,7 @@ header_html = """
     .logo-text { color: white; font-family: 'Arial', sans-serif; font-size: 28px; font-weight: bold; letter-spacing: -1px; }
     .brand-text { color: white; font-family: 'Segoe UI', sans-serif; font-size: 28px; font-weight: 500; }
     
-    /* Título más pequeño para que quepa en una sola línea en móvil */
+    /* Título más pequeño para que quepa en móvil sin romperse feo */
     .main-title { 
         color: white; 
         font-family: 'Impact', sans-serif; 
@@ -166,23 +166,25 @@ zpl_logo_hecho_en_mexico = convertir_imagen_a_zpl("hecho_en_mexico.png", 40, 365
 
 if "numeros_chinos" not in st.session_state: st.session_state.numeros_chinos = {}
 
-# --- LAYOUT PRINCIPAL ---
+# --- LAYOUT PRINCIPAL (STREAMLIT MANEJA EL STACK EN MÓVIL) ---
 col_datos, col_etiqueta = st.columns([1, 1])
 
 with col_datos:
     crear_encabezado_seccion("Configuracion Tecnica")
     c1, c2 = st.columns(2)
+    
+    # REORDENAMIENTO: c1 (Aparece primero arriba en celular) y c2 (Aparece después abajo en celular)
     with c1:
         modelo_seleccionado = st.selectbox("Modelo UPS:", options=list(CATALOGO_UPS.keys()))
-        voltaje_entrada = st.selectbox("Voltaje Entrada:", options=OPCIONES_VOLTAJE_ENTRADA)
-    with c2:
         familia_seleccionada = st.selectbox("Familia:", options=OPCIONES_FAMILIA)
+    with c2:
+        voltaje_entrada = st.selectbox("Voltaje Entrada:", options=OPCIONES_VOLTAJE_ENTRADA)
         voltaje_salida = st.selectbox("Voltaje Salida:", options=OPCIONES_VOLTAJE_SALIDA)
     
     es_mr1 = (familia_seleccionada == "MR1")
     vcc_val = st.number_input("Voltaje de Baterías (Vcc):", value=240, step=12, disabled=es_mr1)
     
-    # Candado para el tamaño de letra para evitar errores táctiles
+    # Candado para el tamaño de letra
     habilitar_letra = st.checkbox("⚙️ Habilitar ajuste de tamaño de letra", value=False)
     tamano_letra = st.slider("Tamaño de letra:", min_value=14, max_value=36, value=26, step=2, disabled=not habilitar_letra)
     
@@ -194,7 +196,7 @@ with col_datos:
     crear_encabezado_seccion("Captura Portatil")
     cantidad = st.number_input("Equipos en lote:", value=1, min_value=1)
     
-    # Serie de exactamente 9 dígitos que arranca en puros ceros
+    # Serie inicial obligatoria de 9 dígitos
     num_serie_ini = st.text_input("Serie Inicial:", value="000000000", max_chars=9)
     es_serie_valida = len(num_serie_ini) == 9 and num_serie_ini.isdigit()
     
