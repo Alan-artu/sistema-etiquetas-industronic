@@ -52,7 +52,6 @@ st.markdown(header_html, unsafe_allow_html=True)
 css_estilo = """
 <style>
 .stApp { background-color: #0E1117; }
-/* Ajustes de etiquetas para que no se vean gigantes en móvil */
 .stSelectbox label, .stTextInput label, .stNumberInput label, .stSlider label {
     font-size: 13px !important; font-weight: 600 !important; color: #F0F2F6 !important;
 }
@@ -166,21 +165,23 @@ zpl_logo_hecho_en_mexico = convertir_imagen_a_zpl("hecho_en_mexico.png", 40, 365
 
 if "numeros_chinos" not in st.session_state: st.session_state.numeros_chinos = {}
 
-# --- LAYOUT PRINCIPAL (STREAMLIT MANEJA EL STACK EN MÓVIL) ---
+# --- LAYOUT PRINCIPAL ---
 col_datos, col_etiqueta = st.columns([1, 1])
 
 with col_datos:
     crear_encabezado_seccion("Configuracion Tecnica")
     c1, c2 = st.columns(2)
     with c1:
-        modelo_seleccionado = st.selectbox("Modelo UPS:", options=list(CATALOGO_UPS.keys()))
-        voltaje_entrada = st.selectbox("Voltaje Entrada:", options=OPCIONES_VOLTAJE_ENTRADA)
+        # BLOQUEO DE EDICIÓN: Agregado disabled=True para evitar apertura de teclado en móvil
+        modelo_seleccionado = st.selectbox("Modelo UPS:", options=list(CATALOGO_UPS.keys()), disabled=True)
+        voltaje_entrada = st.selectbox("Voltaje Entrada:", options=OPCIONES_VOLTAJE_ENTRADA, disabled=True)
     with c2:
-        familia_seleccionada = st.selectbox("Familia:", options=OPCIONES_FAMILIA)
-        voltaje_salida = st.selectbox("Voltaje Salida:", options=OPCIONES_VOLTAJE_SALIDA)
+        # BLOQUEO DE EDICIÓN: Agregado disabled=True para evitar apertura de teclado en móvil
+        familia_seleccionada = st.selectbox("Familia:", options=OPCIONES_FAMILIA, disabled=True)
+        voltaje_salida = st.selectbox("Voltaje Salida:", options=OPCIONES_VOLTAJE_SALIDA, disabled=True)
     
     es_mr1 = (familia_seleccionada == "MR1")
-    vcc_val = st.number_input("Voltaje de Baterías (Vcc):", value=240, step=12, disabled=es_mr1)
+    vcc_val = st.number_input("Voltaje de Baterías (Vcc):", value=240, step=12, disabled=True)
     tamano_letra = st.slider("Tamaño de letra:", min_value=14, max_value=36, value=26, step=2)
     
     datos_fijos = CATALOGO_UPS[modelo_seleccionado]
